@@ -206,6 +206,6 @@ if __name__ == '__main__':
     sequenceName = "576781"
     actor = data_actor(sequenceName)
     show_actor(actor)
-    vmtk_mesher(sequenceName)
+    # vmtk_mesher(sequenceName)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
