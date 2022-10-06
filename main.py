@@ -4,9 +4,13 @@ import vmtk
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 from vmtk import vmtkscripts, vmtksurfacereader, vmtkmeshgenerator, vtkvmtk
-from vmtk import pype
+from vmtk import vmtksurfacereader
 
 import vtk
+from vmtk.vmtksurfacereader import vmtkSurfaceReader
+from vmtk.vmtksurfaceremeshing import vmtkSurfaceRemeshing
+from vmtk.vmtksurfaceviewer import vmtkSurfaceViewer
+from vmtk.vmtksurfacewriter import vmtkSurfaceWriter
 from vmtk.vtkvmtkComputationalGeometryPython import vtkvmtkPolyDataCenterlines
 from vtk.util.numpy_support import numpy_to_vtk
 import numpy as np
@@ -68,37 +72,16 @@ def data_actor(sequenceName):
 
 
 def vmtk_mesher(sequenceName):
-    # capper = vtkvmtkCapPolyData()
-    # capper.SetInputConnection(dataFilter.GetOutputPort())
-    # capper.SetDisplacement(0)
-    # capper.SetInPlaneDisplacement(0)
-    # capper.Update()
-    #
 
-    #
-    # centerlineFilter = vtkvmtkPolyDataCenterlines()
-    # centerlineFilter.SetInputData(capper.GetOutput())
-    # centerlineFilter.SetSourceSeedIds(sourceSeeds)
-    # centerlineFilter.SetTargetSeedIds(targetSeeds)
-    # centerlineFilter.SetRadiusArrayName("MaximumInscribedSphereRadius")
-    # centerlineFilter.SetCostFunction("1/R")
-    # centerlineFilter.SetFlipNormals(0)
-    # centerlineFilter.SetAppendEndPointsToCenterlines(1)
-    # centerlineFilter.SetSimplifyVoronoi(0)
-    # centerlineFilter.SetCenterlineResampling(1)
-    # centerlineFilter.SetResamplingStepLength(1)
-    # centerlineFilter.Update()
-
-    reader = vmtkscripts.vmtkSurfaceReader()
+    reader = vmtkSurfaceReader()
     reader.InputFileName = sequenceName + ".stl"
     reader.ReadSTLSurfaceFile()
     surface = reader.Surface
-
     # viewer = vmtkscripts.vmtkSurfaceViewer()
     # viewer.Surface = surface
     # viewer.Execute()
 
-    remesher = vmtkscripts.vmtkSurfaceRemeshing()
+    remesher = vmtkSurfaceRemeshing()
     remesher.Surface = surface
     remesher.TargetEdgeLength = 20
     remesher.ElementSizeMode = "edgelength"
@@ -115,11 +98,11 @@ def vmtk_mesher(sequenceName):
 
 
 
-    viewer = vmtkscripts.vmtkSurfaceViewer()
+    viewer = vmtkSurfaceViewer()
     viewer.Surface = surface
     viewer.Execute()
 
-    writer = vmtkscripts.vmtkSurfaceWriter()
+    writer = vmtkSurfaceWriter()
     writer.Surface = surface
     writer.OutputFileName = sequenceName + "_remesh.stl"
     writer.Format = "stl"
@@ -206,6 +189,6 @@ if __name__ == '__main__':
     sequenceName = "576781"
     actor = data_actor(sequenceName)
     show_actor(actor)
-    # vmtk_mesher(sequenceName)
+    vmtk_mesher(sequenceName)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -1,0 +1,13 @@
+matlab_path = ""
+
+[segmentation]
+sequence_name = "183511"
+img_format = ".tif"
+original_img_path = ""
+start = 1
+end = 270
+block_num_height = 5
+block_num_width = 8
+
+
+[model]
