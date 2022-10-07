@@ -5,6 +5,7 @@ config = toml.read("../config.toml");
 file_path = config.segmentation.original_img_path;
 sequenceName = config.segmentation.sequence_name;
 format = config.segmentation.img_format;
+outputFormat = config.segmentation.output_format;
 st = config.segmentation.start_img;
 ed = config.segmentation.end_img;
 
@@ -28,7 +29,7 @@ if img_num > 0 %有满足条件的图像
         fprintf('%d %s\n',pn,strcat(file_path,num2str(pn-1)));
         img_origin = imread(strcat(file_path,image_name));
         [bw, RGB, ~] = lumenSegmentation(img_origin);
-        imwrite(bw ,strcat(binary_path, num2str(pn), format));
-        imwrite(RGB ,strcat(label_path, num2str(pn), format));
+        imwrite(bw ,strcat(binary_path, num2str(pn), outputFormat));
+        imwrite(RGB ,strcat(label_path, num2str(pn), outputFormat));
     end
 end
