@@ -1,9 +1,8 @@
-clear;
-close all;
-% load("CENT16902.mat");
+clear;close all;
+addpath(genpath('.'));
 config = toml.read("../config.toml");
 sequenceName = config.segmentation.sequence_name;
-format = config.segmentation.img_format;
+format = config.segmentation.output_format;
 st = config.segmentation.start_img;
 ed = config.segmentation.end_img;
 file_path = strcat("../result/binary/",sequenceName,'/');
@@ -83,7 +82,7 @@ if img_num > 0 %有满足条件的图像
         z(1:end)=(pn-1)*40;
 %         z=z';
         point=[xx,yy,z];
-%         AREA(pn)=length(P);
+        AREA(pn)=polyarea(xx, yy);
         pointCloud(((pn - 1) * 100 + 1) : (pn * 100),:) = point;
 %         pointCloud=[pointCloud;point];
 %         close all
@@ -91,9 +90,9 @@ if img_num > 0 %有满足条件的图像
 end
 mkdir(strcat("../result/pointClouds/",sequenceName));
 save(strcat("../result/pointClouds/",sequenceName,"/pointCloud.txt"), 'pointCloud', '-ascii');
-% save(strcat('Area',sequenceName,".mat"),'AREA');
-% scatter3(pointCloud(:,1),pointCloud(:,2),pointCloud(:,3));
-% hold on
-% scatter3(zeros(z(1),1),zeros(z(1),1),1:z(1));
-% axis equal
+save(strcat("../result/pointClouds/",sequenceName,"/area.mat"),'AREA');
+scatter3(pointCloud(:,1),pointCloud(:,2),pointCloud(:,3),'.');
+hold on
+scatter3(zeros(z(1),1),zeros(z(1),1),1:z(1),'.');
+axis equal
 

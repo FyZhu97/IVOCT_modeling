@@ -3,6 +3,7 @@ matlab_path = "C:/Program Files/MATLAB/R2020b/bin/matlab.exe"
 [segmentation]
 sequence_name = "855513"
 img_format = ".tif"
+output_format = ".png"
 original_img_path = "C:/Users/18139/Documents/OCT_Processing/imagesequence/狭窄病变 无支架/罗金枝_855513_20220719093641/855513_罗金枝_56/2022_06_15__13_55_47/"
 start_img = 0
 end_img = 0

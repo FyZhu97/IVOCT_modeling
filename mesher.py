@@ -1,27 +1,23 @@
 # This is a sample Python script.
 import os
+from tkinter.messagebox import *
 
-import vmtk
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-from vmtk import vmtkscripts, vmtksurfacereader, vmtkmeshgenerator, vtkvmtk
-from vmtk import vmtksurfacereader
-
+import gmsh
+import numpy as np
+import toml
 import vtk
 from vmtk.vmtksurfacereader import vmtkSurfaceReader
 from vmtk.vmtksurfaceremeshing import vmtkSurfaceRemeshing
 from vmtk.vmtksurfaceviewer import vmtkSurfaceViewer
 from vmtk.vmtksurfacewriter import vmtkSurfaceWriter
-from vmtk.vmtkcenterlines import vmtkCenterlines
-from vmtk.vmtkcenterlineviewer import vmtkCenterlineViewer
 from vtk.util.numpy_support import numpy_to_vtk
-import numpy as np
-import toml
-import gmsh
 
 
-def data_actor(source_data):
+# Press Shift+F10 to execute it or replace it with your code.
+# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+
+
+def data_actor(source_data, sequenceName):
     numOfSlices = int(len(source_data) / 100)
     # 新建 vtkPoints 实例
     points = vtk.vtkPoints()
@@ -104,53 +100,22 @@ def vmtk_mesher(sequenceName):
     writer.OutputFileName = "./mesh/" + sequenceName + "/vtk_surface_remesh.stl"
     writer.Format = "stl"
     writer.Execute()
-
-    cent_calculator = vmtkCenterlines()
-    cent_calculator.SeedSelectorName = "profileidlist"
-    cent_calculator.SourceIds = [1]
-    cent_calculator.TargetIds = [0]
-    cent_calculator.Surface = surface
-    cent_calculator.Execute()
-    centerline = cent_calculator.Centerlines
-
-    writer = vmtkSurfaceWriter()
-    writer.Surface = centerline
-    writer.OutputFileName = "./mesh/" + sequenceName + "/centerlines.vtk"
-    writer.Format = "vtk"
-    writer.Execute()
-
-    # viewer = vmtkSurfaceViewer()
-    # viewer.Surface = centerline
-    # viewer.Execute()
-    # sizingFunction = vtkvmtk.vtkvmtkPolyDataSizingFunction()
-    # sizingFunction.SetInputData(surface)
-    # sizingFunction.SetSizingFunctionArrayName('VolumeSizingFunction')
-    # sizingFunction.SetScaleFactor(0.8)
-    # sizingFunction.Update()
-    meshGenerator = vmtkscripts.vmtkMeshGenerator()
-    meshGenerator.Surface = surface
-    meshGenerator.SkipRemeshing = 1
-    meshGenerator.SkipCapping = 1
-    meshGenerator.TargetEdgeLength = 20
-    # meshGenerator.Tetrahedralize = 1
-    meshGenerator.Execute()
-
-    # myArguments = "vmtksurfacereader -ifile 183511_sb.vtp --pipe vmtkcenterlines -seedselector profileidlist -sourceids 1 -targetids 0 "\
-    #               "--pipe vmtkflowextensions -adaptivelength 1 -extensionratio 20 -normalestimationratio 1 -interactive 0 "\
-    #               "--pipe vmtkmeshgenerator -ofile 183511.vtu -edgelength 1 --pipe vmtkmeshviewer" \
-    #               # "--pipe vmtksurfacewriter -ofile 183511_ex.vtp "
-    # myPype = pype.PypeRun(myArguments)
-    # myArguments = "vmtksurfacereader -ifile 183511_ex.vtp --pipe vmtkrenderer --pipe " \
-    #               "vmtksurfaceviewer -opacity 0.25 --pipe vmtksurfaceviewer -i @vmtkcenterlines.voronoidiagram -array " \
-    #               "MaximumInscribedSphereRadius --pipe vmtksurfaceviewer -i @vmtkcenterlines.o "
-    # myPype = pype.PypeRun(myArguments)
-    # myArguments = "vmtkmeshgenerator -ifile 183511_ex.vtp -ofile 183511.vtu -edgelength 20 --pipe vmtkmeshviewer "
-    # myPype = pype.PypeRun(myArguments)
+    return surface
+    # cent_calculator = vmtkCenterlines()
+    # cent_calculator.SeedSelectorName = "profileidlist"
+    # cent_calculator.SourceIds = [1]
+    # cent_calculator.TargetIds = [0]
+    # cent_calculator.Surface = surface
+    # cent_calculator.Execute()
+    # centerline = cent_calculator.Centerlines
     #
-    #
-    # surface = myPype.GetScriptObject("vmtkmeshgenerator", '0')
+    # writer = vmtkSurfaceWriter()
+    # writer.Surface = centerline
+    # writer.OutputFileName = "./mesh/" + sequenceName + "/centerlines.vtk"
+    # writer.Format = "vtk"
+    # writer.Execute()
 
-    # myPype.GetScriptObject('vmtkimagereader','0').Surface
+
 
 
 def show_actor(actor):
@@ -189,13 +154,25 @@ def gmsh_mesher():
     gmsh.initialize()
     gmsh.algorithm = 1
 
+def generateModel():
+    config = toml.load("./config.toml")
+    sequenceName = config["segmentation"]["sequence_name"]
+    data_path = "./result/pointClouds/" + sequenceName + "/pointCloud.txt"
+    if not os.path.exists(data_path):
+        showinfo(title="error", message="point cloud does not exist")
+    source_data = np.loadtxt(data_path)
+    data_actor(source_data, sequenceName)
+    surface = vmtk_mesher(sequenceName)
+    viewer = vmtkSurfaceViewer()
+    viewer.Surface = surface
+    viewer.Execute()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     config = toml.load("./config.toml")
     sequenceName = config["segmentation"]["sequence_name"]
     source_data = np.loadtxt("./result/pointClouds/" + sequenceName + "/pointCloud.txt")
-    actor = data_actor(source_data)
+    actor = data_actor(source_data, sequenceName)
     # show_actor(actor)
     vmtk_mesher(sequenceName)
     gmsh_mesher()
