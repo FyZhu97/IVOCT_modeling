@@ -22,6 +22,7 @@ bw = removeCatheter(bw);
 
 
 BW2nd=verticalCut(bw, 30);
+BW2nd=imbinarize(BW2nd);
 BW2nd=imfill(BW2nd,'holes');
 
 
@@ -32,7 +33,8 @@ bw=imdilate(bw,se);
 bw = verticalCut(bw, 20);
 bw = removeArtifacts(bw);
 bw=imfill(bw,'holes');
-
+bw = horizontalCut(bw,10);
+% figure;imshow(bw);
 
 %% 以下部分为插值相关
 
@@ -47,7 +49,7 @@ for j=1:m
     end
 end
 bw5=edge(bw);
-
+% figure;imshow(bw5);
 %% 恢复管壁区域
 plist4=regionprops(BW2nd,'PixelList');
 list4=regionprops(BW2nd,'PixelIdxList');
@@ -63,7 +65,7 @@ for p=1:l
         BW2nd(list4(p).PixelIdxList)=0;
     end
 end
-
+% figure;imshow(BW2nd);
 y2 = interpolateLumenBoundary(BW2nd,50);
 bwImg = false(m,n);
 for j=1:m
@@ -75,7 +77,7 @@ for j=1:m
 end
 
 bw2=edge(bwImg);
-[X,map]=gray2ind(B2,65536);
+[X,map]=gray2ind(img_adjust,65536);
 RGB=ind2rgb(X,map);
 [m1,n1]=size(RGB(:,:,1));
 for i=1:m1
@@ -103,6 +105,27 @@ for i = 1:m %去除竖直长条状连通域
             end
             q=0;
         elseif q>consecutiveNum&&bw(i,p)==0
+            q=0;
+        end
+    end
+    q=0;
+end
+end
+
+function bw = horizontalCut(bw, consecutiveNum)
+q=0;
+[m,n] = size(bw);
+for i = 1:n %去除横向长条状连通域
+    for p=1:m
+        if bw(p,i)==1
+            q=q+1;
+        end
+        if q<consecutiveNum&&bw(p,i)==0 %若连续像素点小于阈值则去除
+            for j=(p-q):p
+                bw(j,i)=0;
+            end
+            q=0;
+        elseif q>consecutiveNum&&bw(p,i)==0
             q=0;
         end
     end
