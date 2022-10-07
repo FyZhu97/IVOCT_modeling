@@ -1,5 +1,8 @@
 # IVOCT_modeling
 
+## 介绍
+整合了IVOCT心血管管腔轮廓提取、点云生成、以及建模的GUI
+
 ## 环境配置
 
 python版本建议3.6.x
