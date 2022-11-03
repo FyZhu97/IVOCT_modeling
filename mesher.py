@@ -81,7 +81,7 @@ def vmtk_mesher(sequenceName):
     remesher.TargetEdgeLength = 20
     remesher.ElementSizeMode = "edgelength"
     # remesher.CellEntityIdsArrayName = 'CellEntityIds'
-    remesher.TargetEdgeLength = 20
+    remesher.TargetEdgeLength = 40
     remesher.MaxEdgeLength = 1E16
     remesher.MinEdgeLength = 0
     remesher.TargetEdgeLengthFactor = 1

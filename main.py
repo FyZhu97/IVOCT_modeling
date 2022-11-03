@@ -1,15 +1,12 @@
 import os
 from tkinter import *
 
-import numpy as np
 import toml
+from PIL import Image, ImageTk
 
 from mesher import generateModel
-from segmentation import lumenSegmentation
-
 from pointCloudGenerator import generatePointCloud
-
-from PIL import Image,ImageTk
+from segmentation import lumenSegmentation
 
 # global photo
 if __name__ == '__main__':
@@ -32,8 +29,11 @@ if __name__ == '__main__':
     config = toml.load("./config.toml")
     sequenceName = config["segmentation"]["sequence_name"]
     result_path = "./result/label/" + sequenceName
-    files = os.listdir(result_path)  # 读入文件夹
-    num_img = len(files)
+    if os.path.exists(result_path):
+        files = os.listdir(result_path)  # 读入文件夹
+        num_img = len(files)
+    else:
+        num_img = 1
     scroll = Scale(img_frame, from_=1, to=num_img, orient=HORIZONTAL, length=512)  # orient=HORIZONTAL设置水平方向显示
     scroll.grid(row=0, column=0, padx=10, pady=10)
     emptyImg = Image.new("1",(512, 250),"BLACK")
@@ -42,6 +42,8 @@ if __name__ == '__main__':
     img_label.grid(row=1, column=0, padx=10, pady=10)
     def imgUpdate(event):
         global photo,img
+        if not os.path.exists(result_path):
+            return
         num = scroll.get()
         img_path = result_path + "/" + str(num) + ".png"
         img = Image.open(img_path).resize((512, 250))
